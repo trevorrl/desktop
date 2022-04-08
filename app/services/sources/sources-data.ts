@@ -152,6 +152,15 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     supportList: [$t('Desktop audio')],
     icon: 'icon-audio',
   },
+  wasapi_app_capture: {
+    name: $t('Application Audio Capture'),
+    description: $t(
+      'Application Audio Capture',
+    ),
+    demoFilename: 'audio-output.png',
+    supportList: [$t('Game audio')],
+    icon: 'icon-audio',
+  },
   scene: {
     name: $t('Scene'),
     description: $t('Allows you to add existing scene as a source'),
