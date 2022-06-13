@@ -100,6 +100,7 @@ export type TSourceType =
   | 'dshow_input'
   | 'wasapi_input_capture'
   | 'wasapi_output_capture'
+  | 'wasapi_app_capture'
   | 'decklink-input'
   | 'scene'
   | 'ndi_source'
