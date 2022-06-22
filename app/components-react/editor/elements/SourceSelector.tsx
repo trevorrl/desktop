@@ -21,6 +21,8 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
+import { useVuex } from 'components-react/hooks';
+import { Services } from 'components-react/service-provider';
 
 interface ISourceMetadata {
   id: string;
@@ -91,31 +93,6 @@ class SourceSelectorModule {
     };
 
     return getTreeNodes(nodeData.filter(n => !n.parentId));
-  }
-
-  get nodeData(): ISourceMetadata[] {
-    console.log('CALCULATING NODE DATA');
-
-    return this.scene.getNodes().map(node => {
-      const itemsForNode = this.getItemsForNode(node.id);
-      const isVisible = itemsForNode.some(i => i.visible);
-      const isLocked = itemsForNode.every(i => i.locked);
-      const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
-      const isStreamVisible = itemsForNode.every(i => i.streamVisible);
-
-      const isFolder = !isItem(node);
-      return {
-        id: node.id,
-        title: node.name,
-        icon: 'fa fa-folder',
-        isVisible,
-        isLocked,
-        isRecordingVisible,
-        isStreamVisible,
-        parentId: node.parentId,
-        isFolder,
-      };
-    });
   }
 
   // TODO: Clean this up.  These only access state, no helpers
@@ -464,8 +441,8 @@ function StudioControls() {
 }
 
 function ItemsTree() {
+  const { ScenesService } = Services;
   const {
-    nodeData,
     getTreeData,
     activeItemIds,
     expandedFoldersIds,
@@ -475,6 +452,9 @@ function ItemsTree() {
     toggleFolder,
     handleSort,
   } = useModule(SourceSelectorModule);
+  const { nodeData } = useVuex(() => ({
+    nodeData: ScenesService.views.nodeData,
+  }));
 
   const treeData = getTreeData(nodeData);
 

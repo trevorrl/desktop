@@ -14,6 +14,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
+import { getDefined } from 'util/properties-type-guards';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -132,8 +133,60 @@ export interface ISceneItemFolder extends ISceneItemNode {
   sceneNodeType: 'folder';
 }
 
+interface ISourceMetadata {
+  id: string;
+  title: string;
+  icon: string;
+  isVisible: boolean;
+  isLocked: boolean;
+  isStreamVisible: boolean;
+  isRecordingVisible: boolean;
+  isFolder: boolean;
+  parentId?: string;
+}
+
 class ScenesViews extends ViewHandler<IScenesState> {
   @Inject() private scenesService: ScenesService;
+
+  get nodeData(): ISourceMetadata[] {
+    console.log('CALCULATING NODE DATA');
+
+    return this.activeScene.getNodes().map(node => {
+      const itemsForNode = this.getItemsForNode(node.id);
+      const isVisible = itemsForNode.some(i => i.visible);
+      const isLocked = itemsForNode.every(i => i.locked);
+      const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
+      const isStreamVisible = itemsForNode.every(i => i.streamVisible);
+
+      const isFolder = node.isItem();
+      return {
+        id: node.id,
+        title: node.name,
+        icon: 'fa fa-folder',
+        isVisible,
+        isLocked,
+        isRecordingVisible,
+        isStreamVisible,
+        parentId: node.parentId,
+        isFolder,
+      };
+    });
+  }
+
+  getItemsForNode(sceneNodeId: string): ISceneItem[] {
+    const node = getDefined(this.activeScene.state.nodes.find(n => n.id === sceneNodeId));
+
+    if (node.sceneNodeType === 'item') {
+      return [node];
+    }
+
+    const children = this.activeScene.state.nodes.filter(n => n.parentId === sceneNodeId);
+    let childrenItems: ISceneItem[] = [];
+
+    children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
+
+    return childrenItems;
+  }
 
   getScene(sceneId: string): Scene | null {
     const sceneModel = this.state.scenes[sceneId];
