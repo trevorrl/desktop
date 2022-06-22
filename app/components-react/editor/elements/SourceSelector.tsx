@@ -94,6 +94,8 @@ class SourceSelectorModule {
   }
 
   get nodeData(): ISourceMetadata[] {
+    console.log('CALCULATING NODE DATA');
+
     return this.scene.getNodes().map(node => {
       const itemsForNode = this.getItemsForNode(node.id);
       const isVisible = itemsForNode.some(i => i.visible);
@@ -104,8 +106,8 @@ class SourceSelectorModule {
       const isFolder = !isItem(node);
       return {
         id: node.id,
-        title: this.getNameForNode(node),
-        icon: this.determineIcon(!isFolder, isFolder ? node.id : node.sourceId),
+        title: node.name,
+        icon: 'fa fa-folder',
         isVisible,
         isLocked,
         isRecordingVisible,
