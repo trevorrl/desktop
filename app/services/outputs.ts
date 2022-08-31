@@ -15,6 +15,20 @@ export class OutputsService extends Service {
     } else {
       this.stream = obs.SimpleStreamingFactory.create();
     }
+
+    this.migrateSettings();
+  }
+
+  migrateSettings() {
+    const settings = this.advancedMode
+      ? obs.AdvancedStreamingFactory.legacySettings
+      : obs.SimpleStreamingFactory.legacySettings;
+
+    Object.keys(settings).forEach(
+      (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
+        this.setStreamSetting(key, settings[key]);
+      },
+    );
   }
 
   setAdvanced(value: boolean) {
