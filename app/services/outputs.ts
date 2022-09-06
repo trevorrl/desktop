@@ -1,14 +1,25 @@
+import { inject } from 'slap';
 import { Service } from './core/service';
 import * as obs from '../../obs-api';
+import SettingsManagerService from './settings-manager';
 
 export class OutputsService extends Service {
   stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
   advancedMode: boolean;
+  settingsManagerService = inject(SettingsManagerService);
+
+  get simpleStreamSettings() {
+    return this.settingsManagerService.views.simpleStreamSettings;
+  }
+
+  get advancedStreamSettings() {
+    return this.settingsManagerService.views.advancedStreamSettings;
+  }
 
   init() {
     super.init();
 
-    this.advancedMode = obs.SimpleStreamingFactory.legacySettings.useAdvanced;
+    this.advancedMode = this.simpleStreamSettings.useAdvanced;
 
     if (this.advancedMode) {
       this.stream = obs.AdvancedStreamingFactory.create();
@@ -20,9 +31,7 @@ export class OutputsService extends Service {
   }
 
   migrateSettings() {
-    const settings = this.advancedMode
-      ? obs.AdvancedStreamingFactory.legacySettings
-      : obs.SimpleStreamingFactory.legacySettings;
+    const settings = this.advancedMode ? this.advancedStreamSettings  : this.simpleStreamSettings;
 
     Object.keys(settings).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
