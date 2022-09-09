@@ -1,9 +1,13 @@
 import React from 'react';
+import { FormProps, InputProps } from 'antd';
 import * as inputs from './index';
 import Form from './Form';
 import { TInputMetadata } from './metadata';
+import { TSlobsInputProps } from './index';
 
-const componentTable: Dictionary<React.FunctionComponent> = {
+type TInputValue = string | number | boolean;
+
+const componentTable: Dictionary<React.FunctionComponent<TSlobsInputProps<{}, TInputValue>>> = {
     text: inputs.TextInput,
     number: inputs.NumberInput,
     slider: inputs.SliderInput,
@@ -16,13 +20,18 @@ interface IFormMetadata {
     [value: string]: TInputMetadata;
 }
 
-export default function FormFactory(p: { metadata: IFormMetadata }) {
-    <Form>
+export default function FormFactory(p: {
+    metadata: IFormMetadata;
+    onInput: (value: TInputValue) => void;
+    values: Dictionary<TInputValue>;
+    formOptions: FormProps;
+}) {
+    return <Form {...p.formOptions}>
         {Object.keys(p.metadata).map((key: string) => {
             const metadata = p.metadata[key];
             const Input = componentTable[metadata.type];
 
-            return <Input {...p.metadata} />;
+            return <Input {...p.metadata} value={p.values[key]} onChange={p.onInput} />;
         })}
-    </Form>
+    </Form>;
 }
