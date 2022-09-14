@@ -4,55 +4,97 @@ import * as obs from '../../obs-api';
 import SettingsManagerService from './settings-manager';
 
 export class OutputsService extends Service {
-  stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
-  advancedMode: boolean;
   settingsManagerService = inject(SettingsManagerService);
 
-  get simpleStreamSettings() {
-    return this.settingsManagerService.views.simpleStreamSettings;
+  stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
+  recording: obs.ISimpleRecording | obs.IAdvancedRecording;
+  replay: obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer;
+
+  advancedMode: boolean;
+
+  get streamSettings() {
+    return this.advancedMode ? this.settingsManagerService.views.advancedStreamSettings : this.settingsManagerService.views.simpleStreamSettings;
   }
 
-  get advancedStreamSettings() {
-    return this.settingsManagerService.views.advancedStreamSettings;
+  get recordingSettings() {
+    return this.advancedMode ? this.settingsManagerService.views.advancedRecordingSettings : this.settingsManagerService.views.simpleRecordingSettings;
+  }
+
+  get replaySettings() {
+    return this.advancedMode ? this.settingsManagerService.views.advancedReplaySettings : this.settingsManagerService.views.simpleReplaySettings;
   }
 
   init() {
     super.init();
 
-    this.advancedMode = this.simpleStreamSettings.useAdvanced;
+    this.advancedMode = this.settingsManagerService.views.simpleStreamSettings.useAdvanced;
 
     if (this.advancedMode) {
-      this.stream = obs.AdvancedStreamingFactory.create();
+      this.createAdvancedOutputs();
     } else {
-      this.stream = obs.SimpleStreamingFactory.create();
+      this.createSimpleOutputs();
     }
 
     this.migrateSettings();
   }
 
   migrateSettings() {
-    const settings = this.advancedMode ? this.advancedStreamSettings  : this.simpleStreamSettings;
-
-    Object.keys(settings).forEach(
+    Object.keys(this.streamSettings).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-        this.setStreamSetting(key, settings[key]);
+        this.setStreamSetting(key, this.streamSettings[key]);
       },
     );
+    
+    Object.keys(this.recordingSettings).forEach(
+      (key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) => {
+        this.setRecordingSetting(key, this.recordingSettings[key]);
+      },
+    );
+    
+    Object.keys(this.replaySettings).forEach(
+      (key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) => {
+        this.setRecordingSetting(key, this.replaySettings[key]);
+      },
+    );
+
+  }
+
+  createAdvancedOutputs() {
+    if (this.stream) obs.SimpleStreamingFactory.destroy(this.stream as obs.ISimpleStreaming);
+    if (this.recording) obs.SimpleRecordingFactory.destroy(this.recording as obs.ISimpleRecording);
+    if (this.replay) obs.SimpleReplayBufferFactory.destroy(this.replay as obs.ISimpleReplayBuffer);
+
+    this.stream = obs.AdvancedStreamingFactory.create();
+    this.recording = obs.AdvancedRecordingFactory.create();
+    this.replay = obs.AdvancedReplayBufferFactory.create();
+  }
+
+  createSimpleOutputs() {
+    if (this.stream) obs.AdvancedStreamingFactory.destroy(this.stream as obs.IAdvancedStreaming);
+    if (this.recording) obs.AdvancedRecordingFactory.destroy(this.recording as obs.IAdvancedRecording);
+    if (this.replay) obs.AdvancedReplayBufferFactory.destroy(this.replay as obs.IAdvancedReplayBuffer);
+
+    this.stream = obs.SimpleStreamingFactory.create();
+    this.recording = obs.SimpleRecordingFactory.create();
+    this.replay = obs.SimpleReplayBufferFactory.create();
   }
 
   setAdvanced(value: boolean) {
     if (this.advancedMode === value) return;
-    if (value) {
-      obs.SimpleStreamingFactory.destroy(this.stream as obs.ISimpleStreaming);
-      this.stream = obs.AdvancedStreamingFactory.create();
-    } else {
-      obs.AdvancedStreamingFactory.destroy(this.stream as obs.IAdvancedStreaming);
-      this.stream = obs.SimpleStreamingFactory.create();
-    }
+
+    value ? this.createAdvancedOutputs() : this.createSimpleOutputs();
     this.advancedMode = value;
   }
 
   setStreamSetting(key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming, value: unknown) {
     this.stream[key] = value;
+  }
+
+  setRecordingSetting(key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording, value: unknown) {
+    this.recording[key] = value;
+  }
+
+  setReplaySetting(key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer, value: unknown) {
+    this.replay[key] = value;
   }
 }

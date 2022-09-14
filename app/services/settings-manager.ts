@@ -15,6 +15,22 @@ class SettingsManagerViews extends ViewHandler<{}> {
     get advancedStreamSettings() {
         return obs.AdvancedStreamingFactory.legacySettings;
     }
+
+    get simpleRecordingSettings() {
+        return obs.SimpleRecordingFactory.legacySettings;
+    }
+
+    get advancedRecordingSettings() {
+        return obs.AdvancedRecordingFactory.legacySettings;
+    }
+
+    get simpleReplaySettings() {
+        return obs.SimpleReplayBufferFactory.legacySettings;
+    }
+
+    get advancedReplaySettings() {
+        return obs.AdvancedRecordingFactory.legacySettings;
+    }
 }
 
 export default class SettingsManagerService extends Service {
