@@ -211,5 +211,12 @@
   "Twitch VOD": "Twitch VOD",
   "Use authentication": "Use authentication",
   "Username": "Username",
-  "Password": "Password"
+  "Password": "Password",
+  "Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.": "Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.",
+  "Editor": "Editor",
+  "Custom Editor": "Custom Editor",
+  "Studio Mode": "Studio Mode",
+  "Layout Editor": "Layout Editor",
+  "Themes": "Themes",
+  "App Store": "App Store"
 }
