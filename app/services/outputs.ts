@@ -9,6 +9,7 @@ export class OutputsService extends Service {
   stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
   recording: obs.ISimpleRecording | obs.IAdvancedRecording;
   replay: obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer;
+  activeOutputs: string[] = [];
 
   advancedMode: boolean;
 
@@ -22,6 +23,10 @@ export class OutputsService extends Service {
 
   get replaySettings() {
     return this.advancedMode ? this.settingsManagerService.views.advancedReplaySettings : this.settingsManagerService.views.simpleReplaySettings;
+  }
+
+  get hasActiveOutputs() {
+    return this.activeOutputs.length > 0;
   }
 
   init() {
@@ -96,5 +101,15 @@ export class OutputsService extends Service {
 
   setReplaySetting(key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer, value: unknown) {
     this.replay[key] = value;
+  }
+
+  startOutput(key: 'stream' | 'recording' | 'replay') {
+    this[key].start();
+    this.activeOutputs.push(key);
+  }
+
+  endOutput(key: 'stream' | 'recording' | 'replay') {
+    this[key].stop();
+    this.activeOutputs = this.activeOutputs.filter(output => output !== key);
   }
 }
