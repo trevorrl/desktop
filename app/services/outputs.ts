@@ -14,15 +14,21 @@ export class OutputsService extends Service {
   advancedMode: boolean;
 
   get streamSettings() {
-    return this.advancedMode ? this.settingsManagerService.views.advancedStreamSettings : this.settingsManagerService.views.simpleStreamSettings;
+    return this.advancedMode
+      ? this.settingsManagerService.views.advancedStreamSettings
+      : this.settingsManagerService.views.simpleStreamSettings;
   }
 
   get recordingSettings() {
-    return this.advancedMode ? this.settingsManagerService.views.advancedRecordingSettings : this.settingsManagerService.views.simpleRecordingSettings;
+    return this.advancedMode
+      ? this.settingsManagerService.views.advancedRecordingSettings
+      : this.settingsManagerService.views.simpleRecordingSettings;
   }
 
   get replaySettings() {
-    return this.advancedMode ? this.settingsManagerService.views.advancedReplaySettings : this.settingsManagerService.views.simpleReplaySettings;
+    return this.advancedMode
+      ? this.settingsManagerService.views.advancedReplaySettings
+      : this.settingsManagerService.views.simpleReplaySettings;
   }
 
   get hasActiveOutputs() {
@@ -49,19 +55,18 @@ export class OutputsService extends Service {
         this.setStreamSetting(key, this.streamSettings[key]);
       },
     );
-    
+
     Object.keys(this.recordingSettings).forEach(
       (key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) => {
         this.setRecordingSetting(key, this.recordingSettings[key]);
       },
     );
-    
+
     Object.keys(this.replaySettings).forEach(
       (key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) => {
         this.setRecordingSetting(key, this.replaySettings[key]);
       },
     );
-
   }
 
   createAdvancedOutputs() {
@@ -76,8 +81,12 @@ export class OutputsService extends Service {
 
   createSimpleOutputs() {
     if (this.stream) obs.AdvancedStreamingFactory.destroy(this.stream as obs.IAdvancedStreaming);
-    if (this.recording) obs.AdvancedRecordingFactory.destroy(this.recording as obs.IAdvancedRecording);
-    if (this.replay) obs.AdvancedReplayBufferFactory.destroy(this.replay as obs.IAdvancedReplayBuffer);
+    if (this.recording) {
+      obs.AdvancedRecordingFactory.destroy(this.recording as obs.IAdvancedRecording);
+    }
+    if (this.replay) {
+      obs.AdvancedReplayBufferFactory.destroy(this.replay as obs.IAdvancedReplayBuffer);
+    }
 
     this.stream = obs.SimpleStreamingFactory.create();
     this.recording = obs.SimpleRecordingFactory.create();
@@ -95,11 +104,17 @@ export class OutputsService extends Service {
     this.stream[key] = value;
   }
 
-  setRecordingSetting(key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording, value: unknown) {
+  setRecordingSetting(
+    key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording,
+    value: unknown,
+  ) {
     this.recording[key] = value;
   }
 
-  setReplaySetting(key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer, value: unknown) {
+  setReplaySetting(
+    key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer,
+    value: unknown,
+  ) {
     this.replay[key] = value;
   }
 

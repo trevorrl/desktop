@@ -8,33 +8,37 @@ from the backend.
 */
 
 class SettingsManagerViews extends ViewHandler<{}> {
-    get simpleStreamSettings() {
-        return obs.SimpleStreamingFactory.legacySettings;
-    }
+  get simpleStreamSettings() {
+    return obs.SimpleStreamingFactory.legacySettings;
+  }
 
-    get advancedStreamSettings() {
-        return obs.AdvancedStreamingFactory.legacySettings;
-    }
+  get advancedStreamSettings() {
+    return obs.AdvancedStreamingFactory.legacySettings;
+  }
 
-    get simpleRecordingSettings() {
-        return obs.SimpleRecordingFactory.legacySettings;
-    }
+  get simpleRecordingSettings() {
+    return obs.SimpleRecordingFactory.legacySettings;
+  }
 
-    get advancedRecordingSettings() {
-        return obs.AdvancedRecordingFactory.legacySettings;
-    }
+  get advancedRecordingSettings() {
+    return obs.AdvancedRecordingFactory.legacySettings;
+  }
 
-    get simpleReplaySettings() {
-        return obs.SimpleReplayBufferFactory.legacySettings;
-    }
+  get simpleReplaySettings() {
+    return obs.SimpleReplayBufferFactory.legacySettings;
+  }
 
-    get advancedReplaySettings() {
-        return obs.AdvancedRecordingFactory.legacySettings;
-    }
+  get advancedReplaySettings() {
+    return obs.AdvancedRecordingFactory.legacySettings;
+  }
+
+  get videoSettings() {
+    return obs.VideoFactory.legacySettings;
+  }
 }
 
 export default class SettingsManagerService extends Service {
-    get views() {
-        return new SettingsManagerViews({});
-    }
+  get views() {
+    return new SettingsManagerViews({});
+  }
 }

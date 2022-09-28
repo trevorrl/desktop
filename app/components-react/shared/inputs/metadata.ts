@@ -1,4 +1,3 @@
-
 /**
  * Metadata generator for inputs
  * Provides some presets and helps with typechecking
@@ -19,21 +18,20 @@ export const metadata = {
   }),
 };
 
-export type TInputMetadata = ITextMetadata | INumberMetadata | ISliderMetadata | ITextBoolMetadata | IListMetadata;
+export type TInputMetadata =
+  | ITextMetadata
+  | INumberMetadata
+  | ISliderMetadata
+  | ITextBoolMetadata
+  | IListMetadata;
 
-type TInputType =
-    'text' |
-    'number' |
-    'slider' |
-    'bool' |
-    'list' |
-    'seconds'
+type TInputType = 'text' | 'number' | 'slider' | 'bool' | 'list' | 'seconds';
 
 interface IBaseMetadata {
   label?: string;
   tooltip?: string;
   required?: boolean;
-  type: TInputType;
+  type?: TInputType;
 }
 
 interface ITextMetadata extends IBaseMetadata {
@@ -64,4 +62,5 @@ interface IAnyMetadata extends IBaseMetadata {
 
 interface IListMetadata<T = string> extends IBaseMetadata {
   value?: T;
+  options?: { label: string; value: T }[];
 }
