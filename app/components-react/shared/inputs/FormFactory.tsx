@@ -8,30 +8,40 @@ import { TSlobsInputProps } from './index';
 type TInputValue = string | number | boolean;
 
 const componentTable: Dictionary<React.FunctionComponent<TSlobsInputProps<{}, TInputValue>>> = {
-    text: inputs.TextInput,
-    number: inputs.NumberInput,
-    slider: inputs.SliderInput,
-    bool: inputs.CheckboxInput,
-    list: inputs.ListInput,
-    seconds: inputs.SliderInput,
+  text: inputs.TextInput,
+  number: inputs.NumberInput,
+  slider: inputs.SliderInput,
+  bool: inputs.CheckboxInput,
+  list: inputs.ListInput,
+  seconds: inputs.SliderInput,
 };
 
 interface IFormMetadata {
-    [value: string]: TInputMetadata;
+  [value: string]: TInputMetadata;
 }
 
 export default function FormFactory(p: {
-    metadata: IFormMetadata;
-    onInput: (value: TInputValue) => void;
-    values: Dictionary<TInputValue>;
-    formOptions: FormProps;
+  metadata: IFormMetadata;
+  onInput: (key: string) => (value: TInputValue) => void;
+  values: Dictionary<TInputValue>;
+  formOptions?: FormProps;
 }) {
-    return <Form {...p.formOptions}>
-        {Object.keys(p.metadata).map((key: string) => {
-            const metadata = p.metadata[key];
-            const Input = componentTable[metadata.type];
+  return (
+    <Form {...p.formOptions}>
+      {Object.keys(p.metadata).map((key: string) => {
+        const metadata = p.metadata[key];
+        if (!metadata.type) return <div />;
 
-            return <Input {...p.metadata} value={p.values[key]} onChange={p.onInput} />;
-        })}
-    </Form>;
+        const Input = componentTable[metadata.type];
+
+        return (
+          <Input
+            {...p.metadata}
+            value={p.values[key]}
+            onChange={metadata.onChange || p.onInput(key)}
+          />
+        );
+      })}
+    </Form>
+  );
 }

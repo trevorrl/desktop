@@ -4,11 +4,11 @@
  */
 export const metadata = {
   any: (options: IAnyMetadata) => options,
-  text: (options: ITextMetadata) => ({ ...options, type: 'text' }),
-  number: (options: INumberMetadata) => ({ ...options, type: 'number' }),
-  slider: (options: ISliderMetadata) => ({ ...options, type: 'slider' }),
-  bool: (options: ITextBoolMetadata) => ({ ...options, type: 'bool' }),
-  list: <T>(options: IListMetadata<T>) => ({ ...options, type: 'list' }),
+  text: (options: ITextMetadata) => ({ ...options, type: 'text' as TInputType }),
+  number: (options: INumberMetadata) => ({ ...options, type: 'number' as TInputType }),
+  slider: (options: ISliderMetadata) => ({ ...options, type: 'slider' as TInputType }),
+  bool: (options: ITextBoolMetadata) => ({ ...options, type: 'bool' as TInputType }),
+  list: <T>(options: IListMetadata<T>) => ({ ...options, type: 'list' as TInputType }),
   seconds: (options: ISliderMetadata) => ({
     min: 0,
     step: 1000,
@@ -32,6 +32,8 @@ interface IBaseMetadata {
   tooltip?: string;
   required?: boolean;
   type?: TInputType;
+  validator?: (value: unknown) => boolean;
+  onChange?: (value: unknown) => void;
 }
 
 interface ITextMetadata extends IBaseMetadata {

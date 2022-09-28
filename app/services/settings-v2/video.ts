@@ -33,12 +33,50 @@ export default class VideoService extends Service {
 
   get videoSettingsMetadata() {
     return {
-      baseRes: metadata.list({ label: $t('Base (Canvas) Resolution'), options: resOptions }),
-      outputRes: metadata.list({ label: $t('Output (Scaled) Resolution'), options: resOptions }),
-      scaleType: metadata.list({ label: $t('Downscale Filter') }),
-      fpsType: metadata.list({ label: $t('FPS Type') }),
-      fpsNum: metadata.number({}),
-      fpsDen: metadata.number({}),
+      baseRes: metadata.list({
+        label: $t('Base (Canvas) Resolution'),
+        options: resOptions,
+        validator: this.validateResolution,
+        onChange: (val: string) => this.setResolution('baseRes', val),
+      }),
+      outputRes: metadata.list({
+        label: $t('Output (Scaled) Resolution'),
+        options: resOptions,
+        validator: this.validateResolution,
+        onChange: (val: string) => this.setResolution('outputRes', val),
+      }),
+      scaleType: metadata.list({
+        label: $t('Downscale Filter'),
+        options: [
+          {
+            label: $t('Bilinear (Fastest, but blurry if scaling)'),
+            value: obs.EScaleType.Bilinear,
+          },
+          { label: $t('Bicubic (Sharpened scaling, 16 samples)'), value: obs.EScaleType.Bicubic },
+          { label: $t('Lanczos (Sharpened scaling, 32 samples)'), value: obs.EScaleType.Lanczos },
+        ],
+      }),
+      fpsType: metadata.list({
+        label: $t('FPS Type'),
+        options: [
+          { label: $t('Common FPS Values'), value: obs.EFPSType.Common },
+          { label: $t('Integer FPS Values'), value: obs.EFPSType.Integer },
+          { label: $t('Fractional FPS Values'), value: obs.EFPSType.Fractional },
+        ],
+      }),
+      fpsNum: metadata.number({ label: $t('FPS Number') }),
+      fpsDen: metadata.number({ label: $t('FPS Density') }),
+    };
+  }
+
+  get videoSettingsValues() {
+    return {
+      baseRes: `${this.videoSettings.baseWidth}x${this.videoSettings.baseHeight}`,
+      outputRes: `${this.videoSettings.outputWidth}x${this.videoSettings.outputHeight}`,
+      scaleType: this.videoSettings.scaleType,
+      fpsType: this.videoSettings.fpsType,
+      fpsNum: this.videoSettings.fpsNum,
+      fpsDen: this.videoSettings.fpsDen,
     };
   }
 
