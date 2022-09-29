@@ -19,8 +19,10 @@ class VideoSettingsModule {
   }
 }
 
-export default function VideoSettings() {
+export function VideoSettings() {
   const { values, metadata, onChange } = useModule(VideoSettingsModule);
 
   return <FormFactory values={values} metadata={metadata} onInput={onChange} />;
 }
+
+VideoSettings.page = 'Video';

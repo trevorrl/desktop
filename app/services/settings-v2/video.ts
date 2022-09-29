@@ -4,6 +4,7 @@ import * as obs from '../../../obs-api';
 import SettingsManagerService from '../settings-manager';
 import { $t } from 'services/i18n';
 import { metadata, IListMetadata } from 'components-react/shared/inputs/metadata';
+import { InitAfter } from 'services/core';
 
 // export interface IVideo {
 //   fpsNum: number;
@@ -19,10 +20,26 @@ import { metadata, IListMetadata } from 'components-react/shared/inputs/metadata
 //   fpsType: EFPSType;
 // }
 
+interface ICommonFPS {
+  fpsNum: number;
+  fpsDen: number;
+}
+
 const resOptions = [{ label: '', value: '' }];
 
-const fpsOptions = [{ label: '', value: { fpsNum: 0, fpsDen: 0 } }];
+const fpsOptions = [
+  { label: '10', value: { fpsNum: 10, fpsDen: 1 } },
+  { label: '20', value: { fpsNum: 20, fpsDen: 1 } },
+  { label: '24 NTSC', value: { fpsNum: 24000, fpsDen: 1001 } },
+  { label: '25', value: { fpsNum: 25, fpsDen: 1 } },
+  { label: '29.97', value: { fpsNum: 30000, fpsDen: 1001 } },
+  { label: '30', value: { fpsNum: 30, fpsDen: 1 } },
+  { label: '48', value: { fpsNum: 48, fpsDen: 1 } },
+  { label: '59.94', value: { fpsNum: 60000, fpsDen: 1001 } },
+  { label: '60', value: { fpsNum: 60, fpsDen: 1 } },
+];
 
+@InitAfter('UserService')
 export default class VideoService extends Service {
   settingsManagerService = inject(SettingsManagerService);
 
@@ -70,7 +87,8 @@ export default class VideoService extends Service {
           fpsCom: metadata.list({
             label: $t('Common FPS Values'),
             options: fpsOptions,
-          }) as IListMetadata<{ fpsNum: number; fpsDen: number }>,
+            onChange: (val: ICommonFPS) => this.setCommonFPS(val),
+          }) as IListMetadata<ICommonFPS>,
           fpsNum: metadata.number({
             label: $t('FPS Number'),
             displayed: [obs.EFPSType.Integer, obs.EFPSType.Fractional].includes(
@@ -131,5 +149,10 @@ export default class VideoService extends Service {
     const prefix = key === 'baseRes' ? 'base' : 'output';
     this.setVideoSetting(`${prefix}Width`, splitVal[0]);
     this.setVideoSetting(`${prefix}Height`, splitVal[1]);
+  }
+
+  setCommonFPS(value: ICommonFPS) {
+    this.videoContext.fpsNum = value.fpsNum;
+    this.videoContext.fpsDen = value.fpsDen;
   }
 }
