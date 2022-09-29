@@ -33,13 +33,26 @@ export default function FormFactory(p: {
         if (!metadata.type) return <div />;
 
         const Input = componentTable[metadata.type];
+        const children = metadata.children;
 
         return (
-          <Input
-            {...p.metadata}
-            value={p.values[key]}
-            onChange={metadata.onChange || p.onInput(key)}
-          />
+          <>
+            <Input
+              {...p.metadata}
+              value={p.values[key]}
+              onChange={metadata.onChange || p.onInput(key)}
+            />
+            {children &&
+              Object.keys(children)
+                .filter(childKey => children[childKey].displayed)
+                .map(childKey => (
+                  <Input
+                    {...children[childKey]}
+                    value={p.values[childKey]}
+                    onChange={children[childKey].onChange || p.onInput(childKey)}
+                  />
+                ))}
+          </>
         );
       })}
     </Form>

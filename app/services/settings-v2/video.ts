@@ -3,7 +3,7 @@ import { Service } from '../core/service';
 import * as obs from '../../../obs-api';
 import SettingsManagerService from '../settings-manager';
 import { $t } from 'services/i18n';
-import { metadata } from 'components-react/shared/inputs/metadata';
+import { metadata, IListMetadata } from 'components-react/shared/inputs/metadata';
 
 // export interface IVideo {
 //   fpsNum: number;
@@ -20,6 +20,8 @@ import { metadata } from 'components-react/shared/inputs/metadata';
 // }
 
 const resOptions = [{ label: '', value: '' }];
+
+const fpsOptions = [{ label: '', value: { fpsNum: 0, fpsDen: 0 } }];
 
 export default class VideoService extends Service {
   settingsManagerService = inject(SettingsManagerService);
@@ -63,9 +65,24 @@ export default class VideoService extends Service {
           { label: $t('Integer FPS Values'), value: obs.EFPSType.Integer },
           { label: $t('Fractional FPS Values'), value: obs.EFPSType.Fractional },
         ],
+
+        children: {
+          fpsCom: metadata.list({
+            label: $t('Common FPS Values'),
+            options: fpsOptions,
+          }) as IListMetadata<{ fpsNum: number; fpsDen: number }>,
+          fpsNum: metadata.number({
+            label: $t('FPS Number'),
+            displayed: [obs.EFPSType.Integer, obs.EFPSType.Fractional].includes(
+              this.videoSettingsValues.fpsType,
+            ),
+          }),
+          fpsDen: metadata.number({
+            label: $t('FPS Density'),
+            displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Fractional,
+          }),
+        },
       }),
-      fpsNum: metadata.number({ label: $t('FPS Number') }),
-      fpsDen: metadata.number({ label: $t('FPS Density') }),
     };
   }
 

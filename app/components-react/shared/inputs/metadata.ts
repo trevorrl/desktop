@@ -18,12 +18,12 @@ export const metadata = {
   }),
 };
 
-export type TInputMetadata =
+export type TInputMetadata<T = string> =
   | ITextMetadata
   | INumberMetadata
   | ISliderMetadata
   | ITextBoolMetadata
-  | IListMetadata;
+  | IListMetadata<T>;
 
 type TInputType = 'text' | 'number' | 'slider' | 'bool' | 'list' | 'seconds';
 
@@ -34,6 +34,8 @@ interface IBaseMetadata {
   type?: TInputType;
   validator?: (value: unknown) => boolean;
   onChange?: (value: unknown) => void;
+  children?: Dictionary<TInputMetadata<unknown>>;
+  displayed?: boolean;
 }
 
 interface ITextMetadata extends IBaseMetadata {
@@ -62,7 +64,7 @@ interface IAnyMetadata extends IBaseMetadata {
   value?: any;
 }
 
-interface IListMetadata<T = string> extends IBaseMetadata {
+export interface IListMetadata<T = string> extends IBaseMetadata {
   value?: T;
   options?: { label: string; value: T }[];
 }
