@@ -27,7 +27,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'icon-image',
   },
   color_source: {
-    name: $t('Color Source'),
+    name: $t('Color Block'),
     description: $t('Add a color to the background of your whole scene or just a part.'),
     demoFilename: 'color-source.png',
     supportList: colorSupport,
@@ -43,7 +43,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'fas fa-globe',
   },
   ffmpeg_source: {
-    name: $t('Media Source'),
+    name: $t('Media File'),
     description: $t('Add videos or sound clips to your scene.'),
     demoFilename: 'media.png',
     supportList: mediaSupport,
@@ -264,6 +264,6 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   mediasoupconnector: {
     name: $t('Collab Cam'),
     description: $t('Invite a guest to join your stream from a web browser.'),
-    icon: 'fas fa-user',
+    icon: 'icon-team-2',
   },
 });

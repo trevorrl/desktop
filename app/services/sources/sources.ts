@@ -40,6 +40,7 @@ import { VideoService } from 'services/video';
 import { CustomizationService } from '../customization';
 import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
 import { EMonitoringType } from '../../../obs-api';
+import { GuestCamService } from 'services/guest-cam';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -111,6 +112,7 @@ export const macSources: TSourceType[] = [
   'window_capture',
   'syphon-input',
   'decklink-input',
+  'mediasoupconnector',
 ];
 
 class SourcesViews extends ViewHandler<ISourcesState> {
@@ -183,6 +185,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private videoService: VideoService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private guestCamService: GuestCamService;
 
   sourceDisplayData = SourceDisplayData(); // cache source display data
 
@@ -385,6 +388,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
     if (options.audioSettings) {
       this.audioService.views.getSource(id).setSettings(options.audioSettings);
     }
+
+    if (type === 'mediasoupconnector' && options.guestCamStreamId) {
+      this.guestCamService.setGuestSource(options.guestCamStreamId, id);
+    }
   }
 
   removeSource(id: string) {
@@ -518,9 +525,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const obsAvailableTypes = obs.InputFactory.types();
     const allowlistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
-      { description: 'Color Source', value: 'color_source' },
+      { description: 'Color Block', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
-      { description: 'Media Source', value: 'ffmpeg_source' },
+      { description: 'Media File', value: 'ffmpeg_source' },
       { description: 'Image Slide Show', value: 'slideshow' },
       { description: 'Text (GDI+)', value: 'text_gdiplus' },
       { description: 'Text (FreeType 2)', value: 'text_ft2_source' },
@@ -801,12 +808,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
     });
   }
 
-  showGuestCamProperties(source: Source) {
-    const propertiesName = SourceDisplayData()[source.type].name;
+  showGuestCamProperties(source?: Source) {
     this.windowsService.showWindow({
       componentName: 'GuestCamProperties',
-      title: $t('Collab Cam Properties', { sourceName: propertiesName }),
-      queryParams: { sourceId: source.sourceId },
+      title: $t('Collab Cam Properties', { sourceName: $t('Collab Cam') }),
+      queryParams: { sourceId: source?.sourceId },
       size: {
         width: 850,
         height: 660,
