@@ -1,10 +1,10 @@
 import React from 'react';
 import { inject, useModule } from 'slap';
-import { VideoSettingsService } from 'app-services';
+import { Services } from '../../service-provider';
 import FormFactory from 'components-react/shared/inputs/FormFactory';
 
 class VideoSettingsModule {
-  service = inject(VideoSettingsService);
+  service = Services.VideoSettingsService;
 
   get values() {
     return this.service.videoSettingsValues;
