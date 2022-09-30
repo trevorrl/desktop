@@ -1,10 +1,10 @@
-import { inject } from 'slap';
+import { Inject } from 'vue-property-decorator';
+import { InitAfter } from 'services/core';
 import { Service } from '../core/service';
 import * as obs from '../../../obs-api';
-import SettingsManagerService from '../settings-manager';
+import { SettingsManagerService } from 'app-services';
 import { $t } from 'services/i18n';
 import { metadata, IListMetadata } from 'components-react/shared/inputs/metadata';
-import { InitAfter } from 'services/core';
 
 // export interface IVideo {
 //   fpsNum: number;
@@ -41,12 +41,11 @@ const fpsOptions = [
 
 @InitAfter('UserService')
 export default class VideoService extends Service {
-  settingsManagerService = inject(SettingsManagerService);
+  @Inject() settingsManagerService: SettingsManagerService;
 
   videoContext: obs.IVideo;
 
   init() {
-    super.init();
     this.establishVideoContext();
   }
 
@@ -106,17 +105,17 @@ export default class VideoService extends Service {
 
   get videoSettingsValues() {
     return {
-      baseRes: `${this.videoSettings.baseWidth}x${this.videoSettings.baseHeight}`,
-      outputRes: `${this.videoSettings.outputWidth}x${this.videoSettings.outputHeight}`,
-      scaleType: this.videoSettings.scaleType,
-      fpsType: this.videoSettings.fpsType,
-      fpsNum: this.videoSettings.fpsNum,
-      fpsDen: this.videoSettings.fpsDen,
+      baseRes: `${this.videoContext.baseWidth}x${this.videoContext.baseHeight}`,
+      outputRes: `${this.videoContext.outputWidth}x${this.videoContext.outputHeight}`,
+      scaleType: this.videoContext.scaleType,
+      fpsType: this.videoContext.fpsType,
+      fpsNum: this.videoContext.fpsNum,
+      fpsDen: this.videoContext.fpsDen,
     };
   }
 
   get videoSettings() {
-    return this.settingsManagerService.views.videoSettings;
+    return this.settingsManagerService.videoSettings;
   }
 
   migrateSettings() {

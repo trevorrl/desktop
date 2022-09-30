@@ -7,7 +7,13 @@ once the new persistant storage system is finalized. For now it just retrieves s
 from the backend.
 */
 
-class SettingsManagerViews extends ViewHandler<{}> {
+class SettingsManagerViews extends ViewHandler<{}> {}
+
+export class SettingsManagerService extends Service {
+  get views() {
+    return new SettingsManagerViews({});
+  }
+
   get simpleStreamSettings() {
     return obs.SimpleStreamingFactory.legacySettings;
   }
@@ -34,11 +40,5 @@ class SettingsManagerViews extends ViewHandler<{}> {
 
   get videoSettings() {
     return obs.VideoFactory.legacySettings;
-  }
-}
-
-export default class SettingsManagerService extends Service {
-  get views() {
-    return new SettingsManagerViews({});
   }
 }

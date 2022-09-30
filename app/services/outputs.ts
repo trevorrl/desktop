@@ -1,10 +1,10 @@
-import { inject } from 'slap';
+import { Inject } from 'vue-property-decorator';
 import { Service } from './core/service';
 import * as obs from '../../obs-api';
-import SettingsManagerService from './settings-manager';
+import { SettingsManagerService } from 'app-services';
 
 export class OutputsService extends Service {
-  settingsManagerService = inject(SettingsManagerService);
+  @Inject() settingsManagerService: SettingsManagerService;
 
   stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
   recording: obs.ISimpleRecording | obs.IAdvancedRecording;
@@ -15,20 +15,20 @@ export class OutputsService extends Service {
 
   get streamSettings() {
     return this.advancedMode
-      ? this.settingsManagerService.views.advancedStreamSettings
-      : this.settingsManagerService.views.simpleStreamSettings;
+      ? this.settingsManagerService.advancedStreamSettings
+      : this.settingsManagerService.simpleStreamSettings;
   }
 
   get recordingSettings() {
     return this.advancedMode
-      ? this.settingsManagerService.views.advancedRecordingSettings
-      : this.settingsManagerService.views.simpleRecordingSettings;
+      ? this.settingsManagerService.advancedRecordingSettings
+      : this.settingsManagerService.simpleRecordingSettings;
   }
 
   get replaySettings() {
     return this.advancedMode
-      ? this.settingsManagerService.views.advancedReplaySettings
-      : this.settingsManagerService.views.simpleReplaySettings;
+      ? this.settingsManagerService.advancedReplaySettings
+      : this.settingsManagerService.simpleReplaySettings;
   }
 
   get hasActiveOutputs() {
@@ -38,7 +38,7 @@ export class OutputsService extends Service {
   init() {
     super.init();
 
-    this.advancedMode = this.settingsManagerService.views.simpleStreamSettings.useAdvanced;
+    this.advancedMode = this.settingsManagerService.simpleStreamSettings.useAdvanced;
 
     if (this.advancedMode) {
       this.createAdvancedOutputs();
