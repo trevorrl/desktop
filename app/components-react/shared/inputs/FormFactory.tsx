@@ -38,6 +38,7 @@ export default function FormFactory(p: {
         return (
           <>
             <Input
+              key={key}
               {...p.metadata}
               value={p.values[key]}
               onChange={metadata.onChange || p.onInput(key)}
@@ -47,6 +48,7 @@ export default function FormFactory(p: {
                 .filter(childKey => children[childKey].displayed)
                 .map(childKey => (
                   <Input
+                    key={childKey}
                     {...children[childKey]}
                     value={p.values[childKey]}
                     onChange={children[childKey].onChange || p.onInput(childKey)}

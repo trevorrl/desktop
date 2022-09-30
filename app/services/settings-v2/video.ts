@@ -1,8 +1,8 @@
-import { Inject } from 'vue-property-decorator';
+import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
-import { Service } from '../core/service';
+import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
-import { SettingsManagerService } from 'app-services';
+import { SettingsManagerService } from 'services/settings-manager';
 import { $t } from 'services/i18n';
 import { metadata, IListMetadata } from 'components-react/shared/inputs/metadata';
 
@@ -40,10 +40,12 @@ const fpsOptions = [
 ];
 
 @InitAfter('UserService')
-export default class VideoService extends Service {
+export class VideoSettingsService extends StatefulService<{ videoContext: obs.IVideo }> {
   @Inject() settingsManagerService: SettingsManagerService;
 
-  videoContext: obs.IVideo;
+  initialState = {
+    videoContext: null as obs.IVideo,
+  };
 
   init() {
     this.establishVideoContext();
@@ -104,13 +106,14 @@ export default class VideoService extends Service {
   }
 
   get videoSettingsValues() {
+    const context = this.state.videoContext;
     return {
-      baseRes: `${this.videoContext.baseWidth}x${this.videoContext.baseHeight}`,
-      outputRes: `${this.videoContext.outputWidth}x${this.videoContext.outputHeight}`,
-      scaleType: this.videoContext.scaleType,
-      fpsType: this.videoContext.fpsType,
-      fpsNum: this.videoContext.fpsNum,
-      fpsDen: this.videoContext.fpsDen,
+      baseRes: `${context.baseWidth}x${context.baseHeight}`,
+      outputRes: `${context.outputWidth}x${context.outputHeight}`,
+      scaleType: context.scaleType,
+      fpsType: context.fpsType,
+      fpsNum: context.fpsNum,
+      fpsDen: context.fpsDen,
     };
   }
 
@@ -121,18 +124,18 @@ export default class VideoService extends Service {
   migrateSettings() {
     Object.keys(this.videoSettings).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-        this.setVideoSetting(key, this.videoSettings[key]);
+        this.SET_VIDEO_SETTING(key, this.videoSettings[key]);
       },
     );
   }
 
   establishVideoContext() {
-    if (this.videoContext) return;
+    if (this.state.videoContext) return;
 
-    this.videoContext = {} as obs.IVideo;
+    this.SET_VIDEO_CONTEXT();
 
     this.migrateSettings();
-    obs.VideoFactory.videoContext = this.videoContext;
+    obs.VideoFactory.videoContext = this.state.videoContext;
   }
 
   validateResolution(value: string) {
@@ -140,18 +143,28 @@ export default class VideoService extends Service {
   }
 
   setVideoSetting(key: string, value: unknown) {
-    this.videoContext[key] = value;
+    this.SET_VIDEO_SETTING(key, value);
   }
 
   setResolution(key: string, value: string) {
     const splitVal = value.split('x').map(val => Number(val));
     const prefix = key === 'baseRes' ? 'base' : 'output';
-    this.setVideoSetting(`${prefix}Width`, splitVal[0]);
-    this.setVideoSetting(`${prefix}Height`, splitVal[1]);
+    this.SET_VIDEO_SETTING(`${prefix}Width`, splitVal[0]);
+    this.SET_VIDEO_SETTING(`${prefix}Height`, splitVal[1]);
   }
 
   setCommonFPS(value: ICommonFPS) {
-    this.videoContext.fpsNum = value.fpsNum;
-    this.videoContext.fpsDen = value.fpsDen;
+    this.SET_VIDEO_SETTING('fpsNum', value.fpsNum);
+    this.SET_VIDEO_SETTING('fpsDen', value.fpsDen);
+  }
+
+  @mutation()
+  SET_VIDEO_CONTEXT() {
+    this.state.videoContext = {} as obs.IVideo;
+  }
+
+  @mutation()
+  SET_VIDEO_SETTING(key: string, value: unknown) {
+    this.state.videoContext[key] = value;
   }
 }

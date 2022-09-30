@@ -211,5 +211,11 @@
   "Twitch VOD": "Twitch VOD",
   "Use authentication": "Use authentication",
   "Username": "Username",
-  "Password": "Password"
+  "Password": "Password",
+  "FPSNum": "FPSNum",
+  "FPSDen": "FPSDen",
+  "Integer FPS Values": "Integer FPS Values",
+  "Fractional FPS Values": "Fractional FPS Values",
+  "FPS Number": "FPS Number",
+  "FPS Density": "FPS Density"
 }
