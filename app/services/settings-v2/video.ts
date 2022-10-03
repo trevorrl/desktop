@@ -20,23 +20,18 @@ import { metadata, IListMetadata } from 'components-react/shared/inputs/metadata
 //   fpsType: EFPSType;
 // }
 
-interface ICommonFPS {
-  fpsNum: number;
-  fpsDen: number;
-}
-
 const resOptions = [{ label: '', value: '' }];
 
 const fpsOptions = [
-  { label: '10', value: { fpsNum: 10, fpsDen: 1 } },
-  { label: '20', value: { fpsNum: 20, fpsDen: 1 } },
-  { label: '24 NTSC', value: { fpsNum: 24000, fpsDen: 1001 } },
-  { label: '25', value: { fpsNum: 25, fpsDen: 1 } },
-  { label: '29.97', value: { fpsNum: 30000, fpsDen: 1001 } },
-  { label: '30', value: { fpsNum: 30, fpsDen: 1 } },
-  { label: '48', value: { fpsNum: 48, fpsDen: 1 } },
-  { label: '59.94', value: { fpsNum: 60000, fpsDen: 1001 } },
-  { label: '60', value: { fpsNum: 60, fpsDen: 1 } },
+  { label: '10', value: '10-1' },
+  { label: '20', value: '20-1' },
+  { label: '24 NTSC', value: '24000-1001' },
+  { label: '25', value: '25-1' },
+  { label: '29.97', value: '30000-1001' },
+  { label: '30', value: '30-1' },
+  { label: '48', value: '48-1' },
+  { label: '59.94', value: '60000-1001' },
+  { label: '60', value: '60-1' },
 ];
 
 @InitAfter('UserService')
@@ -88,8 +83,8 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
           fpsCom: metadata.list({
             label: $t('Common FPS Values'),
             options: fpsOptions,
-            onChange: (val: ICommonFPS) => this.setCommonFPS(val),
-          }) as IListMetadata<ICommonFPS>,
+            onChange: (val: string) => this.setCommonFPS(val),
+          }),
           fpsNum: metadata.number({
             label: $t('FPS Number'),
             displayed: [obs.EFPSType.Integer, obs.EFPSType.Fractional].includes(
@@ -153,9 +148,10 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     this.SET_VIDEO_SETTING(`${prefix}Height`, splitVal[1]);
   }
 
-  setCommonFPS(value: ICommonFPS) {
-    this.SET_VIDEO_SETTING('fpsNum', value.fpsNum);
-    this.SET_VIDEO_SETTING('fpsDen', value.fpsDen);
+  setCommonFPS(value: string) {
+    const [fpsNum, fpsDen] = value.split('-');
+    this.SET_VIDEO_SETTING('fpsNum', fpsNum);
+    this.SET_VIDEO_SETTING('fpsDen', fpsDen);
   }
 
   @mutation()

@@ -22,7 +22,7 @@ class VideoSettingsModule {
 export function VideoSettings() {
   const { values, metadata, onChange } = useModule(VideoSettingsModule);
 
-  return <FormFactory values={values} metadata={metadata} onInput={onChange} />;
+  return <FormFactory values={values} metadata={metadata} onChange={onChange} />;
 }
 
 VideoSettings.page = 'Video';
