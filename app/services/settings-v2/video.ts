@@ -84,6 +84,7 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
             label: $t('Common FPS Values'),
             options: fpsOptions,
             onChange: (val: string) => this.setCommonFPS(val),
+            displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Common,
           }),
           fpsNum: metadata.number({
             label: $t('FPS Number'),
