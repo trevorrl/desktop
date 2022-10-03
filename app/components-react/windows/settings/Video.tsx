@@ -1,7 +1,8 @@
 import React from 'react';
-import { inject, useModule } from 'slap';
+import { useModule } from 'slap';
 import { Services } from '../../service-provider';
 import FormFactory from 'components-react/shared/inputs/FormFactory';
+import styles from './Common.m.less';
 
 class VideoSettingsModule {
   service = Services.VideoSettingsService;
@@ -22,7 +23,16 @@ class VideoSettingsModule {
 export function VideoSettings() {
   const { values, metadata, onChange } = useModule(VideoSettingsModule);
 
-  return <FormFactory values={values} metadata={metadata} onChange={onChange} />;
+  return (
+    <div className={styles.formSection}>
+      <FormFactory
+        values={values}
+        metadata={metadata}
+        onChange={onChange}
+        formOptions={{ layout: 'vertical' }}
+      />
+    </div>
+  );
 }
 
 VideoSettings.page = 'Video';

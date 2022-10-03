@@ -1,4 +1,5 @@
 import { Inject } from 'services/core/injector';
+import * as remote from '@electron/remote';
 import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
@@ -20,9 +21,26 @@ import { metadata, IListMetadata } from 'components-react/shared/inputs/metadata
 //   fpsType: EFPSType;
 // }
 
-const resOptions = [{ label: '', value: '' }];
+const CANVAS_RES_OPTIONS = [
+  { label: '1920x1080', value: '1920x1080' },
+  { label: '1280x720', value: '1280x720' },
+];
 
-const fpsOptions = [
+const OUTPUT_RES_OPTIONS = [
+  { label: '1920x1080', value: '1920x1080' },
+  { label: '1536x864', value: '1536x864' },
+  { label: '1440x810', value: '1440x810' },
+  { label: '1280x720', value: '1280x720' },
+  { label: '1152x648', value: '1152x648' },
+  { label: '1096x616', value: '1096x616' },
+  { label: '960x540', value: '960x540' },
+  { label: '852x480', value: '852x480' },
+  { label: '768x432', value: '768x432' },
+  { label: '698x392', value: '698x392' },
+  { label: '640x360', value: '640x360' },
+];
+
+const FPS_OPTIONS = [
   { label: '10', value: '10-1' },
   { label: '20', value: '20-1' },
   { label: '24 NTSC', value: '24000-1001' },
@@ -50,13 +68,13 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     return {
       baseRes: metadata.list({
         label: $t('Base (Canvas) Resolution'),
-        options: resOptions,
+        options: CANVAS_RES_OPTIONS,
         validator: this.validateResolution,
         onChange: (val: string) => this.setResolution('baseRes', val),
       }),
       outputRes: metadata.list({
         label: $t('Output (Scaled) Resolution'),
-        options: resOptions,
+        options: OUTPUT_RES_OPTIONS,
         validator: this.validateResolution,
         onChange: (val: string) => this.setResolution('outputRes', val),
       }),
@@ -82,7 +100,7 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
         children: {
           fpsCom: metadata.list({
             label: $t('Common FPS Values'),
-            options: fpsOptions,
+            options: FPS_OPTIONS,
             onChange: (val: string) => this.setCommonFPS(val),
             displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Common,
           }),
@@ -117,6 +135,17 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     return this.settingsManagerService.videoSettings;
   }
 
+  get monitorResolutions() {
+    const resOptions: { label: string; value: string }[] = [];
+    const displays = remote.screen.getAllDisplays();
+    displays.forEach(display => {
+      const size = display.size;
+      const res = `${size.width}x${size.height}`;
+      if (!resOptions.find(opt => opt.value === res)) resOptions.push({ label: res, value: res });
+    });
+    return resOptions;
+  }
+
   migrateSettings() {
     Object.keys(this.videoSettings).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
@@ -143,10 +172,10 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
   }
 
   setResolution(key: string, value: string) {
-    const splitVal = value.split('x').map(val => Number(val));
+    const [width, height] = value.split('x').map(val => Number(val));
     const prefix = key === 'baseRes' ? 'base' : 'output';
-    this.SET_VIDEO_SETTING(`${prefix}Width`, splitVal[0]);
-    this.SET_VIDEO_SETTING(`${prefix}Height`, splitVal[1]);
+    this.SET_VIDEO_SETTING(`${prefix}Width`, width);
+    this.SET_VIDEO_SETTING(`${prefix}Height`, height);
   }
 
   setCommonFPS(value: string) {
