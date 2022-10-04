@@ -1,3 +1,6 @@
+import { Rule } from 'antd/lib/form';
+import { TInputType } from './inputs';
+
 /**
  * Metadata generator for inputs
  * Provides some presets and helps with typechecking
@@ -9,6 +12,10 @@ export const metadata = {
   slider: (options: ISliderMetadata) => ({ ...options, type: 'slider' as TInputType }),
   bool: (options: ITextBoolMetadata) => ({ ...options, type: 'bool' as TInputType }),
   list: <T>(options: IListMetadata<T>) => ({ ...options, type: 'list' as TInputType }),
+  autocomplete: <T>(options: IListMetadata<T>) => ({
+    ...options,
+    type: 'autocomplete' as TInputType,
+  }),
   seconds: (options: ISliderMetadata) => ({
     min: 0,
     step: 1000,
@@ -25,14 +32,12 @@ export type TInputMetadata<T = string> =
   | ITextBoolMetadata
   | IListMetadata<T>;
 
-type TInputType = 'text' | 'number' | 'slider' | 'bool' | 'list' | 'seconds';
-
 interface IBaseMetadata {
   label?: string;
   tooltip?: string;
   required?: boolean;
   type?: TInputType;
-  validator?: (value: unknown) => boolean;
+  rules?: Rule[];
   onChange?: (value: unknown) => void;
   children?: Dictionary<TInputMetadata<unknown>>;
   displayed?: boolean;

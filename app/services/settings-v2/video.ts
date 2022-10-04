@@ -66,16 +66,16 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
 
   get videoSettingsMetadata() {
     return {
-      baseRes: metadata.list({
+      baseRes: metadata.autocomplete({
         label: $t('Base (Canvas) Resolution'),
-        options: CANVAS_RES_OPTIONS,
-        validator: this.validateResolution,
+        options: CANVAS_RES_OPTIONS.concat(this.monitorResolutions),
+        rules: [{ validator: this.validateResolution }],
         onChange: (val: string) => this.setResolution('baseRes', val),
       }),
-      outputRes: metadata.list({
+      outputRes: metadata.autocomplete({
         label: $t('Output (Scaled) Resolution'),
         options: OUTPUT_RES_OPTIONS,
-        validator: this.validateResolution,
+        rules: [{ validator: this.validateResolution }],
         onChange: (val: string) => this.setResolution('outputRes', val),
       }),
       scaleType: metadata.list({
@@ -163,8 +163,12 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     obs.VideoFactory.videoContext = this.state.videoContext;
   }
 
-  validateResolution(value: string) {
-    return /0-9+x0-9+/.test(value);
+  validateResolution(rule: unknown, value: string, callback: Function) {
+    if (!/0-9+x0-9+/.test(value)) {
+      callback($t('The resolution must be in the format "0000x0000"'));
+    } else {
+      callback();
+    }
   }
 
   setVideoSetting(key: string, value: unknown) {

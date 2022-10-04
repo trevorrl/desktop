@@ -13,7 +13,7 @@ import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
 import * as InputComponents from './index';
 
-type TInputType =
+export type TInputType =
   | 'code'
   | 'color'
   | 'card'
@@ -23,6 +23,7 @@ type TInputType =
   | 'toggle'
   | 'checkbox'
   | 'list'
+  | 'autocomplete'
   | 'mediaurl'
   | 'audiourl'
   | 'tags'

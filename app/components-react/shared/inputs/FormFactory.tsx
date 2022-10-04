@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormProps } from 'antd';
 import * as inputs from './index';
-import Form from './Form';
+import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
 import { TSlobsInputProps } from './index';
 
@@ -14,6 +14,7 @@ const componentTable: Dictionary<React.FunctionComponent<TSlobsInputProps<{}, TI
   bool: inputs.CheckboxInput,
   list: inputs.ListInput,
   seconds: inputs.SliderInput,
+  autocomplete: inputs.AutocompleteInput,
 };
 
 interface IFormMetadata {
@@ -26,8 +27,10 @@ export default function FormFactory(p: {
   values: Dictionary<TInputValue>;
   formOptions?: FormProps;
 }) {
+  const form = useForm();
+
   return (
-    <Form {...p.formOptions}>
+    <Form {...p.formOptions} form={form}>
       {Object.keys(p.metadata).map((inputKey: string) => (
         <FormInput
           key={inputKey}
