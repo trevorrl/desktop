@@ -217,5 +217,6 @@
   "Integer FPS Values": "Integer FPS Values",
   "Fractional FPS Values": "Fractional FPS Values",
   "FPS Number": "FPS Number",
-  "FPS Density": "FPS Density"
+  "FPS Density": "FPS Density",
+  "The resolution must be in the format \"0000x0000\"": "The resolution must be in the format \"0000x0000\""
 }

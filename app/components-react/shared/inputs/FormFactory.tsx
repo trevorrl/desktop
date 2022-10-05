@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormProps } from 'antd';
+import debounce from 'lodash/debounce';
 import * as inputs from './index';
 import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
@@ -28,6 +29,15 @@ export default function FormFactory(p: {
   formOptions?: FormProps;
 }) {
   const form = useForm();
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      console.log('validating fields');
+      form.submit();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Form {...p.formOptions} form={form}>
@@ -60,6 +70,7 @@ function FormInput(p: {
     <>
       <Input
         {...p.metadata}
+        name={p.id}
         value={p.values[p.id]}
         onChange={p.metadata.onChange || p.onChange(p.id)}
       />
