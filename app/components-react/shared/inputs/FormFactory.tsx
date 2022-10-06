@@ -31,10 +31,8 @@ export default function FormFactory(p: {
   const form = useForm();
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      console.log('validating fields');
-      form.submit();
-    }, 1000);
+    form.setFieldsValue(p.values);
+    const interval = window.setInterval(form.validateFields, 1000);
 
     return () => clearInterval(interval);
   }, []);
