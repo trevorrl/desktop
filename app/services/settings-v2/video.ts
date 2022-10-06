@@ -165,7 +165,7 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
 
   get resolutionValidator() {
     return {
-      message: $t('The resolution must be in the format "0000x0000"'),
+      message: $t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'),
       pattern: /^[0-9]+x[0-9]+$/,
     };
   }
