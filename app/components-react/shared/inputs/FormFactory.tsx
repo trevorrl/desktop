@@ -30,15 +30,14 @@ export default function FormFactory(p: {
 }) {
   const form = useForm();
 
-  useEffect(() => {
-    form.setFieldsValue(p.values);
-    const interval = window.setInterval(form.validateFields, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => form.setFieldsValue(p.values), []);
 
   return (
-    <Form {...p.formOptions} form={form}>
+    <Form
+      {...p.formOptions}
+      form={form}
+      onFieldsChange={() => debounce(form.validateFields, 500)()}
+    >
       {Object.keys(p.metadata).map((inputKey: string) => (
         <FormInput
           key={inputKey}
