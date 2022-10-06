@@ -31,6 +31,16 @@
 
       <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
         <resize-observer @notify="handleResize" />
+        <resize-bar
+          v-if="!isDockCollapsed"
+          class="live-dock-resize-bar live-dock-resize-bar--left"
+          position="right"
+          @resizestart="onResizeStartHandler"
+          @resizestop="onResizeStopHandler"
+          :max="maxDockWidth"
+          :min="minDockWidth"
+          :value="liveDockSize"
+        />
         <component
           class="main-page-container"
           v-if="!showLoadingSpinner"

@@ -1,37 +1,44 @@
 import { TAppPage } from 'services/navigation';
 
+type TExternalLinks = 'cloudbot' | 'alertbox' | 'widgets' | 'tipping' | 'multistream';
+
+export interface IAppMenu {
+  id?: string;
+  name?: string;
+  isActive: boolean;
+  icon?: string;
+}
 export interface IMenu {
   name: string;
   isOpen: boolean;
-  isLegacy: boolean; // Users created after sidebar navigation refactor will see fewer menu items
+  isLegacy?: boolean; // Users created after sidebar navigation refactor will see fewer menu items
   menuItems: (IMenuItem | IParentMenuItem)[];
 }
 
 export interface IMenuItem {
-  target?: TAppPage | 'NavTools'; // optional because menu item could be a toggle
+  target?: TAppPage | 'NavTools' | 'WidgetWindow' | TExternalLinks; // optional because menu item could be a toggle
   title: string;
   trackingTarget?: string;
   icon?: string;
-  isActive?: boolean;
   isLegacy?: boolean;
+  isExpanded: boolean;
+  isActive?: boolean;
 }
 
 export interface IParentMenuItem extends IMenuItem {
-  isExpanded?: boolean;
   isToggled?: boolean;
   isEditor?: boolean;
+
   subMenuItems: IMenuItem[];
 }
 
 export enum ENavName {
   TopNav = 'top-nav',
   BottomNav = 'bottom-nav',
-  Login = 'login-button',
 }
 
 export enum EMenuItem {
   Editor = 'Editor',
-  AlertBox = 'Alert Box',
   LayoutEditor = 'Layout Editor',
   StudioMode = 'Studio Mode',
   Themes = 'Themes',
@@ -64,7 +71,6 @@ export const SideBarTopNavData = (): IMenu => ({
   isLegacy: true, // TODO: update to be set by user creation date
   menuItems: [
     SideNavMenuItems()[EMenuItem.Editor],
-    SideNavMenuItems()[EMenuItem.AlertBox],
     SideNavMenuItems()[EMenuItem.LayoutEditor],
     SideNavMenuItems()[EMenuItem.StudioMode],
     SideNavMenuItems()[EMenuItem.Themes],
@@ -84,14 +90,8 @@ export const SideBarBottomNavData = (): IMenu => ({
     SideNavMenuItems()[EMenuItem.Dashboard],
     SideNavMenuItems()[EMenuItem.GetHelp],
     SideNavMenuItems()[EMenuItem.Settings],
+    SideNavMenuItems()[EMenuItem.Login],
   ],
-});
-
-export const Login = (): IMenu => ({
-  name: ENavName.Login,
-  isOpen: false,
-  isLegacy: true,
-  menuItems: [SideNavMenuItems()[EMenuItem.Login]],
 });
 
 export type TNavMenu = {
@@ -101,7 +101,6 @@ export type TNavMenu = {
 export const SideNavMenu = (): TNavMenu => ({
   [ENavName.TopNav]: SideBarTopNavData(),
   [ENavName.BottomNav]: SideBarBottomNavData(),
-  [ENavName.Login]: Login(),
 });
 
 export type TMenuItems = {
@@ -120,7 +119,6 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isEditor: true, // if true, will show themes in bar when minimized
     // if the user has themes, they will be listed in a subMenuItems property. The trackingTarget is 'custom' e.g: tab === 'default' ? 'editor' : 'custom'
   },
-  [EMenuItem.AlertBox]: SideBarSubMenuItems()[ESubMenuItem.AlertBox],
   [EMenuItem.LayoutEditor]: {
     target: 'LayoutEditor',
     title: EMenuItem.LayoutEditor,
@@ -129,9 +127,10 @@ export const SideNavMenuItems = (): TMenuItems => ({
     // isActive: false,
     isLegacy: true,
     isActive: true, // true for now for coding purposes
+    isExpanded: false,
   },
   [EMenuItem.StudioMode]: {
-    // target: '', this toggles studio mode
+    target: 'Studio',
     title: EMenuItem.StudioMode,
     trackingTarget: 'studio-mode',
     icon: 'icon-studio-mode-3',
@@ -139,6 +138,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isLegacy: true,
     isToggled: false, // toggles
     isActive: true, // true for now for coding purposes
+    isExpanded: false,
   },
   [EMenuItem.Themes]: {
     target: 'BrowseOverlays',
@@ -146,7 +146,6 @@ export const SideNavMenuItems = (): TMenuItems => ({
     trackingTarget: 'themes', // maybe required?
     // isActive: false, // maybe track in MenuStatus
     icon: 'icon-themes',
-    isExpanded: false,
     subMenuItems: [
       SideBarSubMenuItems()[ESubMenuItem.Scene],
       SideBarSubMenuItems()[ESubMenuItem.AlertBox],
@@ -154,17 +153,16 @@ export const SideNavMenuItems = (): TMenuItems => ({
       SideBarSubMenuItems()[ESubMenuItem.TipPage],
     ],
     isActive: true, // true for now for coding purposes
+    isExpanded: false,
   },
 
   [EMenuItem.AppStore]: {
-    target: 'PlatformAppStore',
     title: EMenuItem.AppStore,
-    trackingTarget: 'app-store',
     icon: 'icon-store',
     // isActive: false,
-    isExpanded: false,
     subMenuItems: [SideBarSubMenuItems()[ESubMenuItem.AppsManager]],
     isActive: true, // true for now for coding purposes
+    isExpanded: false,
   },
   // apps here. ...enabledApps.map(app => app.id)]
   [EMenuItem.Highlighter]: {
@@ -174,6 +172,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
     trackingTarget: 'highlighter',
     // isActive: false,
     isActive: true, // true for now for coding purposes
+    isExpanded: false,
   },
   [EMenuItem.ThemeAudit]: {
     target: 'ThemeAudit',
@@ -182,6 +181,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
     trackingTarget: 'themeaudit',
     // isActive: false,
     isActive: true, // true for now for coding purposes
+    isExpanded: false,
   },
   [EMenuItem.DevTools]: {
     title: EMenuItem.DevTools,
@@ -189,12 +189,14 @@ export const SideNavMenuItems = (): TMenuItems => ({
     icon: 'icon-developer',
     isLegacy: false,
     isActive: true,
+    isExpanded: false,
   },
   [EMenuItem.GetPrime]: {
     title: EMenuItem.GetPrime,
     icon: 'icon-prime',
     isLegacy: false,
     isActive: true,
+    isExpanded: false,
   },
   [EMenuItem.Dashboard]: {
     title: EMenuItem.Dashboard,
@@ -208,24 +210,28 @@ export const SideNavMenuItems = (): TMenuItems => ({
       SideBarSubMenuItems()[ESubMenuItem.TipSettings],
       SideBarSubMenuItems()[ESubMenuItem.Multistream],
     ],
+    isExpanded: false,
   },
   [EMenuItem.GetHelp]: {
     title: EMenuItem.GetHelp,
     icon: 'icon-question',
     isLegacy: false,
     isActive: true,
+    isExpanded: false,
   },
   [EMenuItem.Settings]: {
     title: EMenuItem.Settings,
     icon: 'icon-settings',
     isLegacy: false,
     isActive: true,
+    isExpanded: false,
   },
   [EMenuItem.Login]: {
     title: EMenuItem.Login,
     icon: 'icon-user',
     isLegacy: false,
     isActive: true,
+    isExpanded: false,
   },
 });
 
@@ -237,53 +243,49 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
   [ESubMenuItem.Scene]: {
     target: 'BrowseOverlays', // to the scene tab
     title: ESubMenuItem.Scene,
-    // trackingTarget?: 'themes', // maybe required?
-    isActive: false, // maybe track in MenuStatus
+    isExpanded: false,
   },
   [ESubMenuItem.Widget]: {
-    // target: 'Widget', TODO: where does this go?
+    target: 'WidgetWindow',
     title: ESubMenuItem.Widget,
-    // trackingTarget?: 'themes', // maybe required?
-    isActive: false, // maybe track in MenuStatus
+    isExpanded: false,
   },
   [ESubMenuItem.TipPage]: {
     // target: 'Tip Page', TODO: where does this go?
     title: ESubMenuItem.TipPage,
-    // trackingTarget?: 'themes', // maybe required?
-    isActive: false, // maybe track in MenuStatus
+    isExpanded: false,
   },
   [ESubMenuItem.AppsManager]: {
     target: 'PlatformAppMainPage', // to the My Apps tab in Profile?
-    title: 'Apps Manager',
-    // trackingTarget?: 'themes', // maybe required?
-    isActive: false, // maybe track in MenuStatus
+    title: ESubMenuItem.AppsManager,
+    trackingTarget: 'app-store',
+    isExpanded: false,
   },
   [ESubMenuItem.Cloudbot]: {
+    target: 'cloudbot',
     title: ESubMenuItem.Cloudbot,
     isLegacy: false,
-    isActive: true,
+    isExpanded: false,
   },
   [ESubMenuItem.AlertBox]: {
     target: 'AlertboxLibrary',
     title: ESubMenuItem.AlertBox,
     trackingTarget: 'alertbox-library',
-    icon: 'icon-alert-box',
-    isActive: false,
-    isLegacy: true,
+    isExpanded: false,
   },
   [ESubMenuItem.Widgets]: {
+    target: 'widgets',
     title: ESubMenuItem.Widgets,
-    isLegacy: false,
-    isActive: true,
+    isExpanded: false,
   },
   [ESubMenuItem.TipSettings]: {
+    target: 'tipping',
     title: ESubMenuItem.TipSettings,
-    isLegacy: false,
-    isActive: true,
+    isExpanded: false,
   },
   [ESubMenuItem.Multistream]: {
+    target: 'multistream',
     title: ESubMenuItem.Multistream,
-    isLegacy: false,
-    isActive: true,
+    isExpanded: false,
   },
 });

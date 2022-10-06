@@ -5,6 +5,8 @@ import styles from './Chat.m.less';
 import { OS, getOS } from '../../util/operating-systems';
 import { onUnload } from 'util/unload';
 
+// THIS IS THE INTERNAL CHAT BOX (chalk board)
+
 export default function Chat(props: { restream: boolean }) {
   const { ChatService, RestreamService } = Services;
 

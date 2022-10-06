@@ -1,35 +1,30 @@
 import { ViewHandler, InitAfter, PersistentStatefulService } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
 import {
-  TNavMenu,
   TMenuItems,
   EMenuItem,
-  SideNavMenu,
+  IMenuItem,
   SideNavMenuItems,
   ENavName,
   IMenu,
-  Login,
+  IAppMenu,
   SideBarTopNavData,
   SideBarBottomNavData,
 } from './menu-data';
 
 interface ISideNavServiceState {
   isOpen: boolean;
+  hasLegacyMenu: boolean;
   compactView: boolean;
-  sidebar: TNavMenu;
   menuItems: TMenuItems;
+  displayedApps: IAppMenu[]; // array with app info
   [ENavName.TopNav]: IMenu;
   [ENavName.BottomNav]: IMenu;
-  [ENavName.Login]: IMenu;
 }
 
 class SideNavViews extends ViewHandler<ISideNavServiceState> {
   get isOpen() {
     return this.state.isOpen;
-  }
-
-  get sidebar() {
-    return this.state.sidebar;
   }
 
   get compactView() {
@@ -38,6 +33,14 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 
   get menuItems() {
     return this.state.menuItems;
+  }
+
+  get hasLegacyMenu() {
+    return this.state.hasLegacyMenu;
+  }
+
+  get displayedApps() {
+    return this.state.displayedApps;
   }
 
   getMenuItem(name: EMenuItem) {
@@ -49,24 +52,32 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
     if (!name) return;
     return this.state.menuItems[name].isActive;
   }
+
+  getExpandedMenuItems(name: ENavName) {
+    if (!name) return;
+    return this.state[name].menuItems.reduce((keys, menuItem: IMenuItem) => {
+      if (menuItem.isExpanded) {
+        keys.push(menuItem.title as string);
+      }
+      return keys;
+    }, []);
+  }
 }
 
 @InitAfter('UserService')
 export class SideNavService extends PersistentStatefulService<ISideNavServiceState> {
   static defaultState: ISideNavServiceState = {
     isOpen: false,
+    hasLegacyMenu: true, // TODO: true for now, set to false and then update based off of user creation date
     compactView: true,
-    sidebar: SideNavMenu(),
     menuItems: SideNavMenuItems(),
+    displayedApps: Array(5), // only allow the user to have 5 apps displayed in menu
     [ENavName.TopNav]: SideBarTopNavData(),
     [ENavName.BottomNav]: SideBarBottomNavData(),
-    [ENavName.Login]: Login(),
   };
 
   init() {
     super.init();
-
-    // TODO: set menu state off of persisted local storage
   }
 
   get views() {
@@ -81,14 +92,28 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.SET_COMPACT_VIEW();
   }
 
+  expandMenuItem(navName: ENavName, menuItemName: EMenuItem) {
+    // expand/contract menu items
+    this.EXPAND_MENU_ITEM(navName, menuItemName);
+  }
+
   toggleMenuItem(navName: ENavName, menuItemName: EMenuItem) {
+    // show/hide menu items
     this.TOGGLE_MENU_ITEM(navName, menuItemName);
   }
 
-  // setSubMenuStatus(menuName: EMenuItem) {
-  //   if (!menuName) return;
-  //   this.SET_EXPANDED_STATUS(menuName);
-  // }
+  toggleApp(index: number) {
+    // show hide apps in menu
+    this.TOGGLE_APP(index);
+  }
+
+  swapApp(app: IAppMenu, index: number) {
+    this.SWAP_APP(app, index);
+  }
+
+  hideApp(index: number) {
+    this.HIDE_APP(index);
+  }
 
   @mutation()
   private OPEN_CLOSE_MENU() {
@@ -114,33 +139,54 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private TOGGLE_MENU_ITEM(navName: ENavName, menuItemName: EMenuItem) {
-    // show/hide menu items
-    console.log(
-      'TOGGLING: this.state[navName].menuItems[menuItemName] ',
-      this.state[navName].menuItems.find(menuItem => menuItem.title === menuItemName),
-    );
-    console.log(
-      'EQUALS TO: this.state.menuItems[menuItemName] ',
-      this.state.menuItems[menuItemName],
-    );
     // find menu item and set to the opposite of current state
     this.state[navName].menuItems.find(
-      menuItem => menuItem.title === menuItemName,
-    ).isActive = !this.state[navName].menuItems.find(menuItem => menuItem.title === menuItemName)
-      .isActive;
+      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+    ).isActive = !this.state[navName].menuItems.find(
+      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+    ).isActive;
 
     // find menu item in object used for toggling custom navigation settings
     this.state.menuItems[menuItemName].isActive = !this.state.menuItems[menuItemName].isActive;
   }
 
-  // @mutation()
-  // SET_EXPANDED_STATUS(menuItemName: EMenuItem) {
-  //   // show/hide submenu items
-  //   if (this.state.menuItems[menuItemName].hasOwnProperty())
-  //   Vue.set(
-  //     this.state.menuItems[menuItemName],
-  //     'isExpanded',
-  //     !this.state.menuItems[menuItemName].isExpanded,
-  //   );
-  // }
+  @mutation()
+  private TOGGLE_APP(index: number) {
+    console.log('TOGGLE APP');
+    this.state.displayedApps[index].isActive = !this.state.displayedApps[index].isActive;
+  }
+
+  @mutation()
+  private HIDE_APP(index: number) {
+    console.log('HIDING');
+    this.state.displayedApps = [...this.state.displayedApps.splice(index, 1, null)];
+  }
+
+  @mutation()
+  private SWAP_APP(app: IAppMenu, index: number) {
+    console.log('SHOWING');
+    this.state.displayedApps[index] = app;
+  }
+
+  @mutation()
+  private EXPAND_MENU_ITEM(navName: ENavName, menuItemName: EMenuItem) {
+    // find menu item and set to the opposite of current state
+    console.log('navName ', navName);
+    console.log('menuItemName ', menuItemName);
+    console.log(
+      'before this.state[navName].menuItems.find( ',
+      this.state[navName].menuItems.find((menuItem: IMenuItem) => menuItem.title === menuItemName),
+    );
+    this.state[navName].menuItems.find(
+      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+    ).isExpanded = !this.state[navName].menuItems.find(
+      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+    ).isExpanded;
+
+    console.log(
+      'after ',
+      this.state[navName].menuItems.find((menuItem: IMenuItem) => menuItem.title === menuItemName)
+        .isExpanded,
+    );
+  }
 }
