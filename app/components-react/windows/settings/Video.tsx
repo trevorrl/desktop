@@ -16,7 +16,7 @@ class VideoSettingsModule {
   }
 
   onChange(key: string) {
-    return (val: unknown) => this.service.setVideoSetting(key, val);
+    return (val: unknown) => this.service.actions.setVideoSetting(key, val);
   }
 }
 
