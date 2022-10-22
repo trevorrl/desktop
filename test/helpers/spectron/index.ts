@@ -319,21 +319,22 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    if (!t.passed) {
+    //if (!t.passed) {
       try {
         const logLines = readLogs().split('\n');
         console.log('>> ------------------------');
-        for (let i = Math.max(0, logLines.length - 30); i < logLines.length; i++) {
+        for (let i = Math.max(0, logLines.length - 20); i < logLines.length; i++) {
           console.log('>> ' + logLines[i]);
         }
-        console.log('>> ------------------------');
         const logServerLines = readServerLogs().split('\n');
-        for (let i = Math.max(0, logServerLines.length - 30); i < logServerLines.length; i++) {
+				console.log('>> ------------------------');
+        for (let i = Math.max(0, logServerLines.length - 20); i < logServerLines.length; i++) {
           console.log('>> ' + logServerLines[i]);
         }
+				console.log('>> ------------------------');
       } catch (e) {
       }
-    }
+    //}
 
     await checkErrorsInLogFile(t);
     if (!testPassed && options.pauseIfFailed) {
