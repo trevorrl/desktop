@@ -319,6 +319,21 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
+    try {
+      const logLines = readLogs().split('\n');
+      console.log('>> ------------------------');
+      for (let i = Math.max(0, logLines.length - 20); i < logLines.length; i++) {
+        console.log('>> ' + logLines[i]);
+      }
+      const logServerLines = readServerLogs().split('\n');
+      console.log('>> ------------------------');
+      for (let i = Math.max(0, logServerLines.length - 20); i < logServerLines.length; i++) {
+        console.log('>> ' + logServerLines[i]);
+      }
+      console.log('>> ------------------------');
+    } catch (e) {
+    }
+
     await checkErrorsInLogFile(t);
     if (!testPassed && options.pauseIfFailed) {
       console.log('Test execution has been paused due `pauseIfFailed` enabled');
@@ -377,6 +392,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const filePath = path.join(lastCacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
     return fs.readFileSync(filePath).toString();
+  }
+
+  function readServerLogs(): string {
+    const folderPath = path.join(lastCacheDir, 'slobs-client\\node-obs\\logs');
+    const files = fs.readdirSync(folderPath);
+    for (let i in files) {
+      if (path.extname(files[i]) === ".txt") {
+        const filePath = path.join(lastCacheDir, 'slobs-client\\node-obs\\logs', files[i]);
+        if (!fs.existsSync(filePath)) return "";
+        return fs.readFileSync(filePath).toString();
+      }
+    }
+    return "";
   }
 
   function getSyncIPCCalls() {
