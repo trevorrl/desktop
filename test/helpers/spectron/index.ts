@@ -320,7 +320,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.afterEach.always(async t => {
     //if (!t.passed) {
-      try {
+      /*try {
         const logLines = readLogs().split('\n');
         console.log('>> ------------------------');
         for (let i = 0; i < logLines.length; i++) {
@@ -333,7 +333,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         }
 				console.log('>> ------------------------');
       } catch (e) {
-      }
+      }*/
     //}
 
     await checkErrorsInLogFile(t);
