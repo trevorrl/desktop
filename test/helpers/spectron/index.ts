@@ -322,12 +322,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     try {
       const logLines = readLogs().split('\n');
       console.log('>> ------------------------');
-      for (let i = Math.max(0, logLines.length - 20); i < logLines.length; i++) {
+      for (let i = 0; i < logLines.length; i++) {
         console.log('>> ' + logLines[i]);
       }
       const logServerLines = readServerLogs().split('\n');
       console.log('>> ------------------------');
-      for (let i = Math.max(0, logServerLines.length - 20); i < logServerLines.length; i++) {
+      for (let i = 0; i < logServerLines.length; i++) {
         console.log('>> ' + logServerLines[i]);
       }
       console.log('>> ------------------------');
