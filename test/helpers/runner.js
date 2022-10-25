@@ -14,7 +14,7 @@ const fetch = require('node-fetch');
 const failedTestsFile = 'test-dist/failed-tests.json';
 const testStatsFile = 'test-dist/test-stats.json';
 const args = process.argv.slice(2);
-const TIMEOUT = 2; // timeout in minutes
+const TIMEOUT = 10; // timeout in minutes
 const {
   BUILD_BUILDID,
   SYSTEM_JOBID,
