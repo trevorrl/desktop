@@ -1,20 +1,3 @@
-<template>
-<div class="resize-bar" :class="{
- top: position === 'top',
- right: position === 'right',
- left: position === 'left',
- active: active
- }"
- :style="{transform: transform}"
- @mousedown="onMouseDownHandler"
->
-  <div class="resize-line" />
-</div>
-</template>
-
-<script lang="ts" src="./ResizeBar.vue.ts"></script>
-
-<style lang="less">
 @import "../../styles/index";
 
 .resize-bar {
@@ -75,4 +58,3 @@
 
   background-color: var(--paragraph);
 }
-</style>
